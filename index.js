@@ -7,7 +7,9 @@ import fileUpload from 'express-fileupload';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import { setServers } from "node:dns/promises";
 
+setServers(["1.1.1.1", "8.8.8.8"]);
 
 const app = express();
 
@@ -24,7 +26,7 @@ mongoose.connect(process.env.DB_URL).then((val) => {
 
 app.use(cors({
   credentials: true,
-  origin: ['http://localhost:5173']
+  origin: ['http://localhost:5173', 'https://student-management-system-frontend-snowy.vercel.app/']
 }));
 app.use(cookieParser());
 app.use(fileUpload({

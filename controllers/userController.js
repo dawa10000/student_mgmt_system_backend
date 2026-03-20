@@ -42,35 +42,37 @@ export const loginUser = async (req, res) => {
 export const registerUser = async (req, res) => {
   const { username, email, password, bio } = req.body || {};
   try {
-    const isExist = await User.findOne({ email });
-    if (isExist) {
-      fs.unlink(`./uploads/${req.imagePath}`, (err) => {
-        if (err) return res.status(500).json({ message: "Something went wrong" });
-        return res.status(400).json({ message: "User already exist" });
-      })
-
-    } else {
-
-      const hashPass = bcrypt.hashSync(password, 10);
-      await User.create({
-        username, email,
-        password: hashPass,
-        image: req.imagePath,
-        bio
-      });
-      return res.status(201).json({ message: "Registered successfully" });
-
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
+    const isExist = await User.findOne({ email });
+    if (isExist) {
+      if (req.imagePath) {
+        fs.unlink(`./uploads/${req.imagePath}`, (err) => {
+          if (err) console.error("Image delete error:", err);
+        });
+      }
+      return res.status(400).json({ message: "User already exist" });
+    }
+
+    const hashPass = await bcrypt.hash(password, 10);
+
+    await User.create({
+      username,
+      email,
+      password: hashPass,
+      image: req.imagePath || "",
+      bio
+    });
+
+    return res.status(201).json({ message: "Registered successfully" });
+
   } catch (err) {
-    return res.status(400).json({
-      message: err.message
-    })
-
+    console.error("Register Error:", err);
+    return res.status(500).json({ message: "Server Error" });
   }
-
 };
-
 
 export const getUserProfile = async (req, res) => {
 
