@@ -24,7 +24,7 @@ mongoose.connect(process.env.DB_URL).then((val) => {
 
 app.use(cors({
   credentials: true,
-  origin: ['http://localhost:5173']
+  origin: ['http://localhost:5173','https://student-management-system-frontend-snowy.vercel.app/']
 }));
 app.use(cookieParser());
 app.use(fileUpload({
