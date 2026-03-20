@@ -92,30 +92,34 @@ export const getUserProfile = async (req, res) => {
 
 
 export const updateUserProfile = async (req, res) => {
-  const { email, username } = req.body || {};
-  try {
+  const { email, username, bio } = req.body || {};
 
+  try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    user.email = email || user.email;
-    user.username = username || user.username;
+    // Update basic fields if provided
+    if (email) user.email = email;
+    if (username) user.username = username;
+    if (bio) user.bio = bio;
+
+    // Handle profile image update
     if (req.imagePath) {
-      fs.unlink(`./uploads/${user.image}`, async (err) => {
-        if (err) return res.status(500).json({ message: "Something went wrong" });
-      })
+      // Delete old image if exists
+      if (user.image) {
+        fs.unlink(`./uploads/${user.image}`, (err) => {
+          if (err) console.error("Failed to delete old image:", err);
+          // Do not throw error; just log
+        });
+      }
       user.image = req.imagePath;
-      await user.save();
-      return res.status(200).json({ message: "Profile updated" });
-    } else {
-      await user.save();
-      return res.status(200).json({ message: "Profile updated" });
     }
 
-  } catch (err) {
-    return res.status(400).json({
-      message: err.message
-    })
-  }
+    await user.save();
+    return res.status(200).json({ message: "Profile updated successfully", user });
 
-}
+  } catch (err) {
+    console.error("Update Profile Error:", err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
