@@ -4,9 +4,13 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
-
 import studentRoutes from './routes/studentRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
+
+import { setServers } from "node:dns/promises";
+
+setServers(["1.1.1.1", "8.8.8.8"]);
 
 dotenv.config();
 
@@ -35,6 +39,7 @@ app.get('/', (req, res) => {
 // ===== Routes =====
 app.use('/api/students', studentRoutes);
 app.use('/api/users', userRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // ===== Connect DB & Start Server =====
 const PORT = process.env.PORT || 5000;
