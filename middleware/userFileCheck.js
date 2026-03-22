@@ -12,7 +12,7 @@ export const userFileCheck = (req, res, next) => {
     message: "Please upload an image"
   });
 
-  const ext = path.extname(file.name);
+  const ext = path.extname(file.name).toLowerCase();
 
   if (!supportedFormats.includes(ext)) return res.status(400).json({
     message: "Unsupported file format"
@@ -37,7 +37,7 @@ export const userFileUpdateCheck = (req, res, next) => {
   const file = req.files?.image;
   if (!file) return next();
 
-  const ext = path.extname(file.name);
+  const ext = path.extname(file.name).toLowerCase();
 
   if (!supportedFormats.includes(ext)) return res.status(400).json({
     message: "Unsupported file format"
